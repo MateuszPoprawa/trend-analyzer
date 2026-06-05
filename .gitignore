@@ -1,0 +1,6 @@
+*azurite*
+*pycache*
+*blob*
+local.settings.json
+host.json
+AzuriteConfig
