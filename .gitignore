@@ -1,6 +1,8 @@
 *azurite*
 *pycache*
 *blob*
+__queuestorage__
+*terraform*
 local.settings.json
 host.json
 AzuriteConfig
