@@ -30,8 +30,13 @@ resource "azurerm_container_app" "frontend" {
       memory = "1Gi"
 
       env {
-        name  = "API_URL"
+        name = "QUERY_SERVICE_URL"
         value = "https://${azurerm_linux_function_app.query.default_hostname}/api/query"
+      }
+
+      env {
+        name  = "TREND_SERVICE_URL"
+        value = "https://${azurerm_linux_function_app.trend.default_hostname}/api/trends"
       }
     }
 
