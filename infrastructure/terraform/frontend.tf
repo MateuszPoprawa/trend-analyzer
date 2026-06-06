@@ -1,7 +1,7 @@
 resource "azurerm_container_registry" "acr" {
   name                = "acrnewstrends12345"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
 
   sku           = "Basic"
   admin_enabled = true
@@ -9,8 +9,8 @@ resource "azurerm_container_registry" "acr" {
 
 resource "azurerm_container_app_environment" "frontend" {
   name                       = "cae-news-trends"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  location                   = azurerm_resource_group.rg.location
+  resource_group_name        = azurerm_resource_group.rg.name
 
   infrastructure_subnet_id = null
 }
@@ -18,7 +18,7 @@ resource "azurerm_container_app_environment" "frontend" {
 resource "azurerm_container_app" "frontend" {
   name                         = "frontend-news-trends"
   container_app_environment_id = azurerm_container_app_environment.frontend.id
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name          = azurerm_resource_group.rg.name
 
   revision_mode = "Single"
 
