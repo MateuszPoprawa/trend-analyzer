@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import requests
 import pandas as pd
@@ -7,7 +8,9 @@ import time
 # =========================
 # CONFIG
 # =========================
-API_URL = "http://localhost:7071/api/trends"  # Trend Service endpoint
+
+QUERY_URL = os.getenv("QUERY_SERVICE_URL")
+TREND_URL = os.getenv("TREND_SERVICE_URL")
 
 st.set_page_config(
     page_title="Trend Analyzer Dashboard",
@@ -17,48 +20,101 @@ st.set_page_config(
 # =========================
 # HEADER
 # =========================
+
 st.title("📊 News Trend Analyzer Dashboard")
 st.caption("Azure + NewsAPI + AI-powered trend analysis")
 
 # =========================
 # INPUT
 # =========================
-topic = st.text_input("Wpisz temat (np. AI, Tesla, Cybersecurity):")
 
-refresh = st.button("Pobierz trendy")
+topic = st.text_input(
+    "Wpisz temat (np. AI, Tesla, Cybersecurity):"
+)
+
+refresh = st.button("Analizuj temat")
 
 # =========================
-# FETCH DATA
+# START PIPELINE
 # =========================
+
 if refresh and topic:
 
-    with st.spinner("Pobieranie danych z Cosmos DB..."):
+    with st.spinner("Uruchamianie analizy..."):
 
-        response = requests.get(API_URL, params={"topic": topic})
+        query_response = requests.post(
+            QUERY_URL,
+            json={"topic": topic},
+            timeout=60
+        )
 
-        if response.status_code != 200:
-            st.error("Błąd pobierania danych")
+        if query_response.status_code not in [200, 202]:
+            st.error(
+                f"Błąd Query Service: {query_response.text}"
+            )
             st.stop()
 
-        data = response.json()
+    st.success("Analiza uruchomiona")
+
+    # =========================
+    # WAIT FOR PROCESSING
+    # =========================
+
+    with st.spinner(
+        "Przetwarzanie newsów przez NLP Service..."
+    ):
+
+        data = None
+
+        for _ in range(15):
+
+            try:
+                response = requests.get(
+                    TREND_URL,
+                    params={"topic": topic},
+                    timeout=30
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    break
+
+            except Exception:
+                pass
+
+            time.sleep(5)
+
+        if data is None:
+            st.error(
+                "Nie znaleziono jeszcze wyników analizy."
+            )
+            st.stop()
 
     st.success("Dane załadowane!")
 
     # =========================
-    # METRICS ROW
+    # METRICS
     # =========================
+
     col1, col2, col3 = st.columns(3)
 
     col1.metric("Temat", data["topic"])
-    col2.metric("Liczba artykułów", data["articles_count"])
-    col3.metric("Średni sentyment", f"{data['avg_sentiment']:.2f}")
+    col2.metric(
+        "Liczba artykułów",
+        data["articles_count"]
+    )
+    col3.metric(
+        "Średni sentyment",
+        f"{data['avg_sentiment']:.2f}"
+    )
 
     st.divider()
 
     # =========================
-    # TOP KEYWORDS
+    # KEYWORDS
     # =========================
-    st.subheader("🔥 Najważniejsze trendy (keywords)")
+
+    st.subheader("🔥 Najważniejsze trendy")
 
     df = pd.DataFrame(data["top_keywords"])
 
@@ -69,13 +125,17 @@ if refresh and topic:
         title="Top keywords w newsach"
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
     st.divider()
 
     # =========================
-    # SENTIMENT VISUALIZATION
+    # SENTIMENT
     # =========================
+
     st.subheader("📈 Analiza sentymentu")
 
     sentiment = data["avg_sentiment"]
@@ -87,24 +147,13 @@ if refresh and topic:
     else:
         st.error("Dominują negatywne newsy ⚠️")
 
-    # gauge-like visualization
     st.progress(float(sentiment))
 
     st.divider()
 
     # =========================
-    # RAW DATA TABLE
+    # RAW JSON
     # =========================
+
     st.subheader("📋 Szczegóły trendu")
-
     st.json(data)
-
-    # =========================
-    # AUTO REFRESH OPTION
-    # =========================
-    st.divider()
-    auto = st.checkbox("Auto-refresh co 30s")
-
-    if auto:
-        time.sleep(30)
-        st.rerun()
