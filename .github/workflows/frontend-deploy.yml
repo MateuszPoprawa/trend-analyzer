@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ACR_NAME: acrnews12345
+      ACR_NAME: acrnewstrends12345
       IMAGE_NAME: streamlit
 
     steps:
