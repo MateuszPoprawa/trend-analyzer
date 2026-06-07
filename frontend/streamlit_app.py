@@ -50,7 +50,7 @@ if refresh and topic:
 
         if query_response.status_code not in [200, 202]:
             st.error(
-                f"Błąd Query Service: {query_response.text}"
+                f"Błąd Query Service: {query_response}"
             )
             st.stop()
 
