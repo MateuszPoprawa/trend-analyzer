@@ -30,6 +30,7 @@ resource "azurerm_linux_function_app" "query" {
   app_settings = {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.appi.instrumentation_key
+    NEWS_API_KEY = var.news_api_key
   }
 }
 
