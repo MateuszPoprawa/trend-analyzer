@@ -1,0 +1,107 @@
+name: Deploy Azure Functions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/**'
+
+  workflow_dispatch:
+
+jobs:
+  deploy-query:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install deps
+        run: |
+          cd services/query-service
+          pip install -r requirements.txt -t .python_packages/lib/site-packages
+
+      - name: Zip package
+        run: |
+          cd services/query-service
+          zip -r ../../query.zip .
+
+      - name: Deploy Query Function
+        uses: Azure/functions-action@v1
+        with:
+          app-name: func-query-news-trends
+          package: query.zip
+
+  deploy-nlp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install deps
+        run: |
+          cd services/nlp-service
+          pip install -r requirements.txt -t .python_packages/lib/site-packages
+
+      - name: Zip package
+        run: |
+          cd services/nlp-service
+          zip -r ../../nlp.zip .
+
+      - name: Deploy NLP Function
+        uses: Azure/functions-action@v1
+        with:
+          app-name: func-nlp-news-trends
+          package: nlp.zip
+
+  deploy-trend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install deps
+        run: |
+          cd services/trend-service
+          pip install -r requirements.txt -t .python_packages/lib/site-packages
+
+      - name: Zip package
+        run: |
+          cd services/trend-service
+          zip -r ../../trend.zip .
+
+      - name: Deploy Trend Function
+        uses: Azure/functions-action@v1
+        with:
+          app-name: func-trend-news-trends
+          package: trend.zip
