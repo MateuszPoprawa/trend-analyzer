@@ -40,3 +40,5 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+        env:
+          TF_VAR_news_api_key: ${{ secrets.NEWS_API_KEY }}
