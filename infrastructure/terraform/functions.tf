@@ -30,7 +30,7 @@ resource "azurerm_linux_function_app" "query" {
   app_settings = {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.appi.instrumentation_key
-    FUNCTIONS_WORKER_RUNTIME = python
+    FUNCTIONS_WORKER_RUNTIME = "python"
     NEWS_API_KEY = var.news_api_key
   }
 }
@@ -51,7 +51,7 @@ resource "azurerm_linux_function_app" "nlp" {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
     AZURE_AI_ENDPOINT      = azurerm_cognitive_account.language.endpoint
     AZURE_AI_KEY           = azurerm_cognitive_account.language.primary_access_key
-    FUNCTIONS_WORKER_RUNTIME = python
+    FUNCTIONS_WORKER_RUNTIME = "python"
   }
 }
 
@@ -69,7 +69,7 @@ resource "azurerm_linux_function_app" "trend" {
 
   app_settings = {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
-    FUNCTIONS_WORKER_RUNTIME = python
+    FUNCTIONS_WORKER_RUNTIME = "python"
     COSMOS_URI = azurerm_cosmosdb_account.cosmos.endpoint
     COSMOS_KEY = azurerm_cosmosdb_account.cosmos.primary_key
   }

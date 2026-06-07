@@ -12,8 +12,6 @@ import time
 QUERY_URL = os.getenv("QUERY_SERVICE_URL")
 TREND_URL = os.getenv("TREND_SERVICE_URL")
 
-st.write("QUERY_URL =", QUERY_URL)
-
 st.set_page_config(
     page_title="Trend Analyzer Dashboard",
     layout="wide"
