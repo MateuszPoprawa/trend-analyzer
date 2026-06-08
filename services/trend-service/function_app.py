@@ -121,8 +121,8 @@ def get_trend(req: func.HttpRequest):
     try:
 
         item = container.read_item(
-            item=topic.lower(),
-            partition_key=topic.lower()
+            item=topic,
+            partition_key=topic
         )
 
         return func.HttpResponse(
@@ -134,7 +134,7 @@ def get_trend(req: func.HttpRequest):
     except Exception as e:
         return func.HttpResponse(
             body=json.dumps({
-                "status": e
+                "status": "processing"
             }),
             mimetype="application/json",
             status_code=404
