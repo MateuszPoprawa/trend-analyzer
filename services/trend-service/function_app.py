@@ -131,11 +131,10 @@ def get_trend(req: func.HttpRequest):
             status_code=200
         )
 
-    except Exception:
-
+    except Exception as e:
         return func.HttpResponse(
             body=json.dumps({
-                "status": "processing"
+                "status": e
             }),
             mimetype="application/json",
             status_code=404

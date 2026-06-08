@@ -7,8 +7,24 @@ resource "azurerm_service_plan" "plan" {
   sku_name = "Y1"
 }
 
-resource "azurerm_application_insights" "appi" {
-  name                = "appi-news-trends"
+resource "azurerm_application_insights" "query" {
+  name                = "appi-query-news-trends"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  application_type = "web"
+}
+
+resource "azurerm_application_insights" "nlp" {
+  name                = "appi-nlp-news-trends"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  application_type = "web"
+}
+
+resource "azurerm_application_insights" "trend" {
+  name                = "appi-trend-news-trends"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -33,7 +49,7 @@ resource "azurerm_linux_function_app" "query" {
 
   app_settings = {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
-    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.appi.instrumentation_key
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.query.instrumentation_key
     FUNCTIONS_WORKER_RUNTIME = "python"
     FUNCTIONS_EXTENSION_VERSION = "~4"
     NEWS_API_KEY = var.news_api_key
@@ -58,6 +74,7 @@ resource "azurerm_linux_function_app" "nlp" {
 
   app_settings = {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.nlp.instrumentation_key
     AZURE_AI_ENDPOINT      = azurerm_cognitive_account.language.endpoint
     AZURE_AI_KEY           = azurerm_cognitive_account.language.primary_access_key
     FUNCTIONS_WORKER_RUNTIME = "python"
@@ -83,6 +100,7 @@ resource "azurerm_linux_function_app" "trend" {
 
   app_settings = {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.trend.instrumentation_key
     FUNCTIONS_WORKER_RUNTIME = "python"
     FUNCTIONS_EXTENSION_VERSION = "~4"
     COSMOS_URI = azurerm_cosmosdb_account.cosmos.endpoint
