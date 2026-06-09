@@ -71,7 +71,7 @@ def fetch_news(topic: str):
         "q": topic,
         "from": from_date,
         "language": "en",
-        "pageSize": 20,
+        "pageSize": 100,
         "sortBy": "publishedAt",
         "apiKey": NEWS_API_KEY
     }

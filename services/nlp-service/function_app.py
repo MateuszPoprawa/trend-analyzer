@@ -53,7 +53,8 @@ def nlp_service(msg: func.ServiceBusMessage):
 
         for article in articles:
             text = (article.get("title", "") + " " +
-                    article.get("description", ""))
+                    article.get("description", "") + " " +
+                    article.get("content", ""))
 
             if not text.strip():
                 continue
