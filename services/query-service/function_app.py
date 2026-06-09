@@ -64,7 +64,7 @@ def query_service(req: func.HttpRequest) -> func.HttpResponse:
 # NEWSAPI CALL
 # =========================
 def fetch_news(topic: str):
-    from_date = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
+    from_date = (datetime.utcnow() - timedelta(days=14)).strftime("%Y-%m-%d")
 
     url = "https://newsapi.org/v2/everything"
     params = {
@@ -78,9 +78,10 @@ def fetch_news(topic: str):
 
     response = requests.get(url, params=params)
     data = response.json()
+    print(params)
     print(data)
     articles = []
-
+    print(data)
     for article in data.get("articles", []):
         articles.append({
             "title": article.get("title"),
