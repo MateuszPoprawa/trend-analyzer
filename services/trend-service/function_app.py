@@ -86,12 +86,6 @@ def trend_service(msg: func.ServiceBusMessage):
     # =========================
     container.upsert_item(trend_result)
 
-    # =========================
-    # SEND TO NEXT STEP (optional)
-    # =========================
-    send_to_service_bus(trend_result)
-
-
 # =========================
 # SENTIMENT NORMALIZATION
 # =========================
@@ -106,16 +100,42 @@ def convert_sentiment(sentiment: str):
 
 
 # =========================
-# SERVICE BUS OUTPUT
+# HTTP Endpoint
 # =========================
-def send_to_service_bus(trend_result: dict):
 
-    client = ServiceBusClient.from_connection_string(SERVICE_BUS_CONN)
+@app.route(
+    route="trends",
+    methods=["GET"],
+    auth_level=func.AuthLevel.ANONYMOUS
+)
+def get_trend(req: func.HttpRequest):
 
-    with client:
-        sender = client.get_topic_sender(topic_name=OUTPUT_TOPIC)
+    topic = req.params.get("topic")
 
-        with sender:
-            sender.send_messages(
-                ServiceBusMessage(json.dumps(trend_result))
-            )
+    if not topic:
+        return func.HttpResponse(
+            "Missing topic parameter",
+            status_code=400
+        )
+
+    try:
+
+        item = container.read_item(
+            item=topic,
+            partition_key=topic
+        )
+
+        return func.HttpResponse(
+            body=json.dumps(item),
+            mimetype="application/json",
+            status_code=200
+        )
+
+    except Exception as e:
+        return func.HttpResponse(
+            body=json.dumps({
+                "status": "processing"
+            }),
+            mimetype="application/json",
+            status_code=404
+        )
