@@ -13,7 +13,6 @@ app = func.FunctionApp()
 # ENV
 # =========================
 SERVICE_BUS_CONN = os.environ["SERVICE_BUS_CONNECTION"]
-OUTPUT_TOPIC = "trends"
 
 COSMOS_URI = os.environ["COSMOS_URI"]
 COSMOS_KEY = os.environ["COSMOS_KEY"]
@@ -31,7 +30,7 @@ container = cosmos_client.get_database_client(DB_NAME).get_container_client(CONT
 # =========================
 @app.service_bus_topic_trigger(
     arg_name="msg",
-    topic_name="analysis-results",
+    topic_name="summary-results",
     subscription_name="trend-subscription",
     connection="SERVICE_BUS_CONNECTION"
 )
@@ -41,62 +40,20 @@ def trend_service(msg: func.ServiceBusMessage):
 
     data = json.loads(msg.get_body().decode("utf-8"))
 
-    topic = data["topic"]
-    analysis = data["analysis"]
-
-    # =========================
-    # AGGREGATION STRUCTURES
-    # =========================
-    keyword_counter = Counter()
-    sentiment_scores = []
-
-    for item in analysis:
-
-        # keywords
-        for kw in item.get("key_phrases", []):
-            keyword_counter[kw.lower()] += 1
-
-        # sentiment
-        score = convert_sentiment(item.get("sentiment"))
-        sentiment_scores.append(score)
-
-    # =========================
-    # BUILD TREND RESULT
-    # =========================
-    top_keywords = keyword_counter.most_common(10)
-
-    avg_sentiment = (
-        sum(sentiment_scores) / len(sentiment_scores)
-        if sentiment_scores else 0
-    )
-
-    trend_result = {
-        "id": topic,
-        "topic": topic,
-        "top_keywords": [
-            {"word": k, "count": v}
-            for k, v in top_keywords
-        ],
-        "avg_sentiment": avg_sentiment,
-        "articles_count": len(analysis),
+    url = data["url"]
+    summary = data["summary"]
+    
+    summary_result = {
+        "id": url,
+        "url": url,
+        "sumarry": summary
     }
 
     # =========================
     # SAVE TO COSMOS DB
     # =========================
-    container.upsert_item(trend_result)
+    container.upsert_item(summary_result)
 
-# =========================
-# SENTIMENT NORMALIZATION
-# =========================
-def convert_sentiment(sentiment: str):
-    if sentiment == "positive":
-        return 1
-    elif sentiment == "neutral":
-        return 0.5
-    elif sentiment == "negative":
-        return 0
-    return 0.5
 
 
 # =========================
@@ -110,19 +67,19 @@ def convert_sentiment(sentiment: str):
 )
 def get_trend(req: func.HttpRequest):
 
-    topic = req.params.get("topic")
+    url = req.params.get("url")
 
-    if not topic:
+    if not url:
         return func.HttpResponse(
-            "Missing topic parameter",
+            "Missing url parameter",
             status_code=400
         )
 
     try:
 
         item = container.read_item(
-            item=topic,
-            partition_key=topic
+            item=url,
+            partition_key=url
         )
 
         return func.HttpResponse(

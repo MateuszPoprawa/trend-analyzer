@@ -44,7 +44,7 @@ if refresh and topic:
 
         query_response = requests.post(
             QUERY_URL,
-            json={"topic": topic},
+            json={"url": topic},
             timeout=60
         )
 
@@ -71,7 +71,7 @@ if refresh and topic:
             try:
                 response = requests.get(
                     TREND_URL,
-                    params={"topic": topic},
+                    params={"url": topic},
                     timeout=30
                 )
 
@@ -91,69 +91,6 @@ if refresh and topic:
             st.stop()
 
     st.success("Dane załadowane!")
-
-    # =========================
-    # METRICS
-    # =========================
-
-    col1, col2, col3 = st.columns(3)
-
-    col1.metric("Temat", data["topic"])
-    col2.metric(
-        "Liczba artykułów",
-        data["articles_count"]
-    )
-    col3.metric(
-        "Średni sentyment",
-        f"{data['avg_sentiment']:.2f}"
-    )
-
-    st.divider()
-
-    # =========================
-    # KEYWORDS
-    # =========================
-
-    st.subheader("🔥 Najważniejsze trendy")
-
-    df = pd.DataFrame(data["top_keywords"])
-
-    fig = px.bar(
-        df,
-        x="word",
-        y="count",
-        title="Top keywords w newsach"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-    st.divider()
-
-    # =========================
-    # SENTIMENT
-    # =========================
-
-    st.subheader("📈 Analiza sentymentu")
-
-    sentiment = data["avg_sentiment"]
-
-    if sentiment > 0.65:
-        st.success("Dominują pozytywne newsy 👍")
-    elif sentiment > 0.4:
-        st.warning("Sentyment mieszany 😐")
-    else:
-        st.error("Dominują negatywne newsy ⚠️")
-
-    st.progress(float(sentiment))
-
-    st.divider()
-
-    # =========================
-    # RAW JSON
-    # =========================
-
-    st.subheader("📋 Szczegóły trendu")
-    st.json(data)
+    
+    st.write(data["summary"])
+    
