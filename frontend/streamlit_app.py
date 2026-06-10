@@ -109,7 +109,10 @@ if refresh and topic:
     )
 
     st.divider()
+    st.subheader("📝 AI Summary")
+    st.info(data["summary"])
 
+    st.divider()
     # =========================
     # KEYWORDS
     # =========================

@@ -42,6 +42,7 @@ def trend_service(msg: func.ServiceBusMessage):
     data = json.loads(msg.get_body().decode("utf-8"))
 
     topic = data["topic"]
+    summary = data["summary"]
     analysis = data["analysis"]
 
     # =========================
@@ -78,7 +79,8 @@ def trend_service(msg: func.ServiceBusMessage):
             for k, v in top_keywords
         ],
         "avg_sentiment": avg_sentiment,
-        "articles_count": len(analysis)
+        "articles_count": len(analysis),
+        "summary": summary
     }
 
     # =========================
