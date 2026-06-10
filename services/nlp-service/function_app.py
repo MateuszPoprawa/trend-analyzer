@@ -4,7 +4,7 @@ import os
 
 import azure.functions as func
 from azure.servicebus import ServiceBusClient, ServiceBusMessage
-
+from azure.ai.textanalytics import TextDocumentInput
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
 
@@ -51,7 +51,7 @@ def nlp_service(msg: func.ServiceBusMessage):
 
         client = get_ai_client()
 
-        poller = client.begin_abstract_summary([text])
+        poller = client.begin_abstract_summary([TextDocumentInput(id="1", text=text)])
         summary = poller.result()
         
         logging.info("Summary generated")
