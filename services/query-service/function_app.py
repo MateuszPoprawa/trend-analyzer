@@ -14,6 +14,7 @@ app = func.FunctionApp()
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
 SERVICE_BUS_CONN = os.environ["SERVICE_BUS_CONNECTION"]
 TOPIC_NAME = "articles"
+MAX_PAGES = 3
 
 # =========================
 # MAIN HTTP TRIGGER
@@ -64,35 +65,69 @@ def query_service(req: func.HttpRequest) -> func.HttpResponse:
 # NEWSAPI CALL
 # =========================
 def fetch_news(topic: str):
-    from_date = (datetime.utcnow() - timedelta(days=14)).strftime("%Y-%m-%d")
+    from_date = (
+        datetime.utcnow() - timedelta(days=7)
+    ).strftime("%Y-%m-%d")
 
     url = "https://newsapi.org/v2/everything"
-    params = {
-        "q": topic,
-        "from": from_date,
-        "language": "en",
-        "pageSize": 100,
-        "sortBy": "publishedAt",
-        "apiKey": NEWS_API_KEY
-    }
 
-    response = requests.get(url, params=params)
-    data = response.json()
-    print(params)
-    print(data)
-    articles = []
-    print(data)
-    for article in data.get("articles", []):
-        articles.append({
-            "title": article.get("title"),
-            "description": article.get("description"),
-            "content": article.get("content"),
-            "url": article.get("url"),
-            "source": article.get("source", {}).get("name"),
-            "publishedAt": article.get("publishedAt")
-        })
+    all_articles = []
+    page = 1
+    page_size = 100
 
-    return articles
+    while page <= MAX_PAGES:
+
+        params = {
+            "q": topic,
+            "from": from_date,
+            "language": "en",
+            "pageSize": page_size,
+            "page": page,
+            "sortBy": "publishedAt",
+            "apiKey": NEWS_API_KEY
+        }
+
+        response = requests.get(
+            url,
+            params=params,
+            timeout=30
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        articles = data.get("articles", [])
+
+        if not articles:
+            break
+
+        for article in articles:
+            all_articles.append({
+                "title": article.get("title"),
+                "description": article.get("description"),
+                "content": article.get("content"),
+                "url": article.get("url"),
+                "source": article.get("source", {}).get("name"),
+                "publishedAt": article.get("publishedAt")
+            })
+
+        print(
+            f"Page {page}: "
+            f"{len(articles)} articles"
+        )
+
+        total_results = data.get("totalResults", 0)
+
+        if len(all_articles) >= total_results:
+            break
+
+        if len(articles) < page_size:
+            break
+
+        page += 1
+
+    return all_articles
 
 
 # =========================
