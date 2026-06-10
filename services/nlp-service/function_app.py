@@ -17,7 +17,7 @@ AI_KEY = os.environ["AZURE_AI_KEY"]
 AI_ENDPOINT = os.environ["AZURE_AI_ENDPOINT"]
 
 SERVICE_BUS_CONN = os.environ["SERVICE_BUS_CONNECTION"]
-OUTPUT_TOPIC = "summary-results"
+OUTPUT_TOPIC = "analysis-results"
 
 # =========================
 # AZURE AI CLIENT

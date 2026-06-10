@@ -30,7 +30,7 @@ container = cosmos_client.get_database_client(DB_NAME).get_container_client(CONT
 # =========================
 @app.service_bus_topic_trigger(
     arg_name="msg",
-    topic_name="summary-results",
+    topic_name="analysis-results",
     subscription_name="trend-subscription",
     connection="SERVICE_BUS_CONNECTION"
 )
