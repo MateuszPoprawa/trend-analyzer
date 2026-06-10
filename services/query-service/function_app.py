@@ -14,7 +14,7 @@ app = func.FunctionApp()
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
 SERVICE_BUS_CONN = os.environ["SERVICE_BUS_CONNECTION"]
 TOPIC_NAME = "articles"
-MAX_PAGES = 3
+MAX_PAGES = 1
 
 # =========================
 # MAIN HTTP TRIGGER
