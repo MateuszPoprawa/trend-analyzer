@@ -51,11 +51,11 @@ def nlp_service(msg: func.ServiceBusMessage):
 
         client = get_ai_client()
 
-        poller = client.begin_abstract_summary(text)
+        poller = client.begin_abstract_summary([text])
         summary = poller.result()
         
         logging.info("Summary generated")
-        
+
         send_to_service_bus(url, summary)
 
     except Exception as e:
