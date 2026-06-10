@@ -51,7 +51,7 @@ def nlp_service(msg: func.ServiceBusMessage):
 
         results = []
 
-        poller = client.begin_abstract_summary(
+        poller = client.begin_extract_summary(
             [article.get("content", "") for article in articles])
 
         for article in articles:
@@ -91,7 +91,7 @@ def nlp_service(msg: func.ServiceBusMessage):
                 "key_phrases": key_phrases.key_phrases
             })
 
-        summary = poller.result()
+        summary = poller.result(20)
         # =========================
         # SEND TO NEXT STEP
         # =========================

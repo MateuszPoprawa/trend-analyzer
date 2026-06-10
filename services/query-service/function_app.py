@@ -112,11 +112,6 @@ def fetch_news(topic: str):
                 "publishedAt": article.get("publishedAt")
             })
 
-        print(
-            f"Page {page}: "
-            f"{len(articles)} articles"
-        )
-
         total_results = data.get("totalResults", 0)
 
         if len(all_articles) >= total_results:
