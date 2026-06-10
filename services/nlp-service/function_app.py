@@ -45,11 +45,16 @@ def nlp_service(msg: func.ServiceBusMessage):
         data = json.loads(msg.get_body().decode("utf-8"))
         url = data.get("url")
         text = data.get("text", "")
+        
+        logging.info("Url: " + url)
+        logging.info("Text: " + text)
 
         client = get_ai_client()
 
         poller = client.begin_abstract_summary(text)
         summary = poller.result()
+        
+        logging.info("Summary generated")
         
         send_to_service_bus(url, summary)
 

@@ -82,7 +82,7 @@ if refresh and topic:
             except Exception:
                 pass
 
-            time.sleep(5)
+            time.sleep(20)
 
         if data is None:
             st.error(

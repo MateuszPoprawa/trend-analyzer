@@ -42,6 +42,8 @@ def query_service(req: func.HttpRequest) -> func.HttpResponse:
             include_tables=False
         )
 
+        logging.info("Text: " + text)
+
         send_to_service_bus(url, text)
 
         return func.HttpResponse(
