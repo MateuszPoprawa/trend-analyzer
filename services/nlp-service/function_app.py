@@ -51,9 +51,6 @@ def nlp_service(msg: func.ServiceBusMessage):
 
         results = []
 
-        poller = client.begin_extract_summary(
-            [article.get("content", "") for article in articles])
-
         for article in articles:
             text = (article.get("title", "") + " " +
                     article.get("description", "") + " " +
@@ -91,11 +88,10 @@ def nlp_service(msg: func.ServiceBusMessage):
                 "key_phrases": key_phrases.key_phrases
             })
 
-        summary = poller.result(20)
         # =========================
         # SEND TO NEXT STEP
         # =========================
-        send_to_service_bus(topic, summary, results)
+        send_to_service_bus(topic, results)
 
     except Exception as e:
         logging.error(str(e))
@@ -104,7 +100,7 @@ def nlp_service(msg: func.ServiceBusMessage):
 # =========================
 # SERVICE BUS OUTPUT
 # =========================
-def send_to_service_bus(topic: str, summary: str, results: list):
+def send_to_service_bus(topic: str, results: list):
 
     client = ServiceBusClient.from_connection_string(
         conn_str=SERVICE_BUS_CONN
@@ -116,7 +112,6 @@ def send_to_service_bus(topic: str, summary: str, results: list):
         with sender:
             message = {
                 "topic": topic,
-                "summary": summary,
                 "analysis": results
             }
 
