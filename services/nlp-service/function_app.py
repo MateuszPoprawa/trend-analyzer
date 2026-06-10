@@ -56,7 +56,7 @@ def nlp_service(msg: func.ServiceBusMessage):
         
         logging.info("Summary generated")
 
-        send_to_service_bus(url, summary)
+        send_to_service_bus(url, summary[0].text)
 
     except Exception as e:
         logging.error(str(e))
