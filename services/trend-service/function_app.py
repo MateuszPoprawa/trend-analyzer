@@ -77,7 +77,7 @@ def get_trend(req: func.HttpRequest):
         )
 
     try:
-        logging.info(id)
+        logging.info("ID: " + id)
         item = container.read_item(item=id, partition_key=id)
 
         return func.HttpResponse(
