@@ -1,5 +1,5 @@
 resource "azurerm_servicebus_namespace" "sb" {
-  name                = "sb-news-trends"
+  name                = "sb-summary-generator"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -15,8 +15,8 @@ resource "azurerm_servicebus_topic" "articles" {
   namespace_id = azurerm_servicebus_namespace.sb.id
 }
 
-resource "azurerm_servicebus_topic" "analysis" {
-  name         = "analysis-results"
+resource "azurerm_servicebus_topic" "summary-results" {
+  name         = "summary-results"
   namespace_id = azurerm_servicebus_namespace.sb.id
 }
 
@@ -26,9 +26,9 @@ resource "azurerm_servicebus_subscription" "nlp" {
   max_delivery_count = 10
 }
 
-resource "azurerm_servicebus_subscription" "trend" {
-  name               = "trend-subscription"
-  topic_id           = azurerm_servicebus_topic.analysis.id
+resource "azurerm_servicebus_subscription" "summary" {
+  name               = "summary-subscription"
+  topic_id           = azurerm_servicebus_topic.summary-results.id
   max_delivery_count = 10
 }
 

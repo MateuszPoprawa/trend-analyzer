@@ -1,19 +1,18 @@
 import os
 import streamlit as st
 import requests
-import pandas as pd
-import plotly.express as px
 import time
+import uuid
 
 # =========================
 # CONFIG
 # =========================
 
 QUERY_URL = os.getenv("QUERY_SERVICE_URL")
-TREND_URL = os.getenv("TREND_SERVICE_URL")
+SUMMARY_URL = os.getenv("SUMMARY_SERVICE_URL")
 
 st.set_page_config(
-    page_title="Trend Analyzer Dashboard",
+    page_title="Summary Generator Dashboard",
     layout="wide"
 )
 
@@ -21,48 +20,46 @@ st.set_page_config(
 # HEADER
 # =========================
 
-st.title("📊 News Trend Analyzer Dashboard")
-st.caption("Azure + NewsAPI + AI-powered trend analysis")
+st.title("📊 Summary Generator Dashboard")
 
 # =========================
 # INPUT
 # =========================
 
-topic = st.text_input(
-    "Wpisz temat (np. AI, Tesla, Cybersecurity):"
+url = st.text_input(
+    "Enter url:"
 )
 
-refresh = st.button("Analizuj temat")
+refresh = st.button("Generate summary")
 
 # =========================
 # START PIPELINE
 # =========================
 
-if refresh and topic:
-
-    with st.spinner("Uruchamianie analizy..."):
-
+if refresh and url:
+    id = str(uuid.uuid4())
+    with st.spinner("Generating  summary..."):
+        id = str(uuid.uuid4())
         query_response = requests.post(
             QUERY_URL,
-            json={"topic": topic},
+            json={"id": id,
+                   "url": url},
             timeout=60
         )
 
         if query_response.status_code not in [200, 202]:
             st.error(
-                f"Błąd Query Service: {query_response}"
+                f"Error Query Service: {query_response}"
             )
             st.stop()
 
-    st.success("Analiza uruchomiona")
+    st.success("Summary generation started.")
 
     # =========================
     # WAIT FOR PROCESSING
     # =========================
 
-    with st.spinner(
-        "Przetwarzanie newsów przez NLP Service..."
-    ):
+    with st.spinner(""):
 
         data = None
 
@@ -70,8 +67,8 @@ if refresh and topic:
 
             try:
                 response = requests.get(
-                    TREND_URL,
-                    params={"topic": topic},
+                    SUMMARY_URL,
+                    params={"id": id, "url": url},
                     timeout=30
                 )
 
@@ -82,78 +79,16 @@ if refresh and topic:
             except Exception:
                 pass
 
-            time.sleep(5)
+            time.sleep(20)
 
         if data is None:
             st.error(
-                "Nie znaleziono jeszcze wyników analizy."
+                "Error occurred."
             )
             st.stop()
 
-    st.success("Dane załadowane!")
-
-    # =========================
-    # METRICS
-    # =========================
-
-    col1, col2, col3 = st.columns(3)
-
-    col1.metric("Temat", data["topic"])
-    col2.metric(
-        "Liczba artykułów",
-        data["articles_count"]
-    )
-    col3.metric(
-        "Średni sentyment",
-        f"{data['avg_sentiment']:.2f}"
-    )
-
-    st.divider()
-
-    # =========================
-    # KEYWORDS
-    # =========================
-
-    st.subheader("🔥 Najważniejsze trendy")
-
-    df = pd.DataFrame(data["top_keywords"])
-
-    fig = px.bar(
-        df,
-        x="word",
-        y="count",
-        title="Top keywords w newsach"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-    st.divider()
-
-    # =========================
-    # SENTIMENT
-    # =========================
-
-    st.subheader("📈 Analiza sentymentu")
-
-    sentiment = data["avg_sentiment"]
-
-    if sentiment > 0.65:
-        st.success("Dominują pozytywne newsy 👍")
-    elif sentiment > 0.4:
-        st.warning("Sentyment mieszany 😐")
-    else:
-        st.error("Dominują negatywne newsy ⚠️")
-
-    st.progress(float(sentiment))
-
-    st.divider()
-
-    # =========================
-    # RAW JSON
-    # =========================
-
-    st.subheader("📋 Szczegóły trendu")
-    st.json(data)
+    st.success("Summary generated!")
+    
+    with st.container(border=True):
+        st.write(data["summary"])
+    

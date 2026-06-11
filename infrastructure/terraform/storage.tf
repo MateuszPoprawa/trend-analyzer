@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "storage" {
-  name                     = "stnewstrends12345"
+  name                     = "stsummarygenerator12345"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
 

@@ -1,5 +1,5 @@
 resource "azurerm_service_plan" "plan" {
-  name                = "plan-news-trends"
+  name                = "plan-summary-generator"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
@@ -8,7 +8,7 @@ resource "azurerm_service_plan" "plan" {
 }
 
 resource "azurerm_application_insights" "query" {
-  name                = "appi-query-news-trends"
+  name                = "appi-query-summary-generator"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -16,15 +16,15 @@ resource "azurerm_application_insights" "query" {
 }
 
 resource "azurerm_application_insights" "nlp" {
-  name                = "appi-nlp-news-trends"
+  name                = "appi-nlp-summary-generator"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   application_type = "web"
 }
 
-resource "azurerm_application_insights" "trend" {
-  name                = "appi-trend-news-trends"
+resource "azurerm_application_insights" "summary" {
+  name                = "appi-summary-generator-summaries"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -32,7 +32,7 @@ resource "azurerm_application_insights" "trend" {
 }
 
 resource "azurerm_linux_function_app" "query" {
-  name                = "func-query-news-trends"
+  name                = "func-query-summary-generator"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
@@ -52,12 +52,11 @@ resource "azurerm_linux_function_app" "query" {
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.query.instrumentation_key
     FUNCTIONS_WORKER_RUNTIME = "python"
     FUNCTIONS_EXTENSION_VERSION = "~4"
-    NEWS_API_KEY = var.news_api_key
   }
 }
 
 resource "azurerm_linux_function_app" "nlp" {
-  name                = "func-nlp-news-trends"
+  name                = "func-nlp-summary-generator"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
@@ -82,8 +81,8 @@ resource "azurerm_linux_function_app" "nlp" {
   }
 }
 
-resource "azurerm_linux_function_app" "trend" {
-  name                = "func-trend-news-trends"
+resource "azurerm_linux_function_app" "summary" {
+  name                = "func-summaries-summary-generator"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
@@ -100,7 +99,7 @@ resource "azurerm_linux_function_app" "trend" {
 
   app_settings = {
     SERVICE_BUS_CONNECTION = azurerm_servicebus_namespace_authorization_rule.functions.primary_connection_string
-    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.trend.instrumentation_key
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.summary.instrumentation_key
     FUNCTIONS_WORKER_RUNTIME = "python"
     FUNCTIONS_EXTENSION_VERSION = "~4"
     COSMOS_URI = azurerm_cosmosdb_account.cosmos.endpoint

@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ACR_NAME: acrnewstrends12345
+      ACR_NAME: acrsummarygenerator12345
       IMAGE_NAME: streamlit
 
     steps:
@@ -44,6 +44,6 @@ jobs:
       - name: Update Container App
         run: |
           az containerapp update \
-            --name frontend-news-trends \
-            --resource-group rg-news-trends \
+            --name frontend-summary-generator \
+            --resource-group rg-summary-generator \
             --image $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}

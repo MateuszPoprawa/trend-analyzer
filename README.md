@@ -1,1 +1,1 @@
-# trend-analyzer
+# summary-generator
