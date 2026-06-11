@@ -89,6 +89,6 @@ if refresh and url:
 
     st.success("Summary generated!")
     
-    with st.container:
+    with st.container():
         st.write(data["summary"])
     
