@@ -90,6 +90,7 @@ def get_trend(req: func.HttpRequest):
         )
 
     except Exception as e:
+        print(e)
         return func.HttpResponse(
             body=json.dumps({
                 "status": "processing"
