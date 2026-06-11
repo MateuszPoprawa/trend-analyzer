@@ -68,9 +68,9 @@ def trend_service(msg: func.ServiceBusMessage):
 )
 def get_trend(req: func.HttpRequest):
 
-    url = req.params.get("id")
+    id = req.params.get("id")
 
-    if not url:
+    if not id:
         return func.HttpResponse(
             "Missing id parameter",
             status_code=400
