@@ -82,7 +82,7 @@ resource "azurerm_linux_function_app" "nlp" {
 }
 
 resource "azurerm_linux_function_app" "summary" {
-  name                = "func-summary-generator-summaries"
+  name                = "func-summaries-summary-generator"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 

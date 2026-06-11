@@ -103,5 +103,5 @@ jobs:
       - name: Deploy Summary Function
         uses: Azure/functions-action@v1
         with:
-          app-name: func-summary-summary-generator
+          app-name: func-summaries-summary-generator
           package: summary.zip
