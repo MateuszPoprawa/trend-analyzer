@@ -77,7 +77,7 @@ def get_trend(req: func.HttpRequest):
         )
 
     try:
-
+        logging.info(id)
         item = container.read_item(
             item=id        )
 
@@ -88,7 +88,7 @@ def get_trend(req: func.HttpRequest):
         )
 
     except Exception as e:
-        print(e)
+        logging.info(e)
         return func.HttpResponse(
             body=json.dumps({
                 "status": "processing"
