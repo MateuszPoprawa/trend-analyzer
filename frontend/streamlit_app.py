@@ -40,7 +40,7 @@ refresh = st.button("Analizuj temat")
 # =========================
 
 if refresh and topic:
-
+    id = str(uuid.uuid4())
     with st.spinner("Uruchamianie analizy..."):
         id = str(uuid.uuid4())
         query_response = requests.post(
