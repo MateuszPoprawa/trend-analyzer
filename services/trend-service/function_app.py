@@ -79,9 +79,7 @@ def get_trend(req: func.HttpRequest):
     try:
 
         item = container.read_item(
-            item=id,
-            partition_key=id
-        )
+            item=id        )
 
         return func.HttpResponse(
             body=json.dumps(item),
