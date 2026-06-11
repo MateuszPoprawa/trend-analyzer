@@ -1,5 +1,5 @@
 resource "azurerm_container_registry" "acr" {
-  name                = "acrnewstrends12345"
+  name                = "acrsummarygenerator12345"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
@@ -16,7 +16,7 @@ resource "azurerm_container_app_environment" "frontend" {
 }
 
 resource "azurerm_container_app" "frontend" {
-  name                         = "frontend-news-trends"
+  name                         = "frontend-summary-generator"
   container_app_environment_id = azurerm_container_app_environment.frontend.id
   resource_group_name          = azurerm_resource_group.rg.name
 
@@ -35,8 +35,8 @@ resource "azurerm_container_app" "frontend" {
       }
 
       env {
-        name  = "TREND_SERVICE_URL"
-        value = "https://${azurerm_linux_function_app.trend.default_hostname}/api/trends"
+        name  = "SUMMARY_SERVICE_URL"
+        value = "https://${azurerm_linux_function_app.summary.default_hostname}/api/summaries"
       }
     }
 

@@ -1,8 +1,6 @@
 import os
 import streamlit as st
 import requests
-import pandas as pd
-import plotly.express as px
 import time
 import uuid
 
@@ -11,10 +9,10 @@ import uuid
 # =========================
 
 QUERY_URL = os.getenv("QUERY_SERVICE_URL")
-TREND_URL = os.getenv("TREND_SERVICE_URL")
+SUMMARY_URL = os.getenv("SUMMARY_SERVICE_URL")
 
 st.set_page_config(
-    page_title="Trend Analyzer Dashboard",
+    page_title="Summary Generator Dashboard",
     layout="wide"
 )
 
@@ -22,49 +20,46 @@ st.set_page_config(
 # HEADER
 # =========================
 
-st.title("📊 News Trend Analyzer Dashboard")
-st.caption("Azure + NewsAPI + AI-powered trend analysis")
+st.title("📊 Summary Generator Dashboard")
 
 # =========================
 # INPUT
 # =========================
 
-topic = st.text_input(
-    "Wpisz temat (np. AI, Tesla, Cybersecurity):"
+url = st.text_input(
+    "Enter url:"
 )
 
-refresh = st.button("Analizuj temat")
+refresh = st.button("Generate summary")
 
 # =========================
 # START PIPELINE
 # =========================
 
-if refresh and topic:
+if refresh and url:
     id = str(uuid.uuid4())
-    with st.spinner("Uruchamianie analizy..."):
+    with st.spinner("Generating  summary..."):
         id = str(uuid.uuid4())
         query_response = requests.post(
             QUERY_URL,
             json={"id": id,
-                   "url": topic},
+                   "url": url},
             timeout=60
         )
 
         if query_response.status_code not in [200, 202]:
             st.error(
-                f"Błąd Query Service: {query_response}"
+                f"Error Query Service: {query_response}"
             )
             st.stop()
 
-    st.success("Analiza uruchomiona")
+    st.success("Summary generation started.")
 
     # =========================
     # WAIT FOR PROCESSING
     # =========================
 
-    with st.spinner(
-        "Przetwarzanie newsów przez NLP Service..."
-    ):
+    with st.spinner(""):
 
         data = None
 
@@ -72,7 +67,7 @@ if refresh and topic:
 
             try:
                 response = requests.get(
-                    TREND_URL,
+                    SUMMARY_URL,
                     params={"id": id},
                     timeout=30
                 )
@@ -88,11 +83,11 @@ if refresh and topic:
 
         if data is None:
             st.error(
-                "Nie znaleziono jeszcze wyników analizy."
+                "Error occurred."
             )
             st.stop()
 
-    st.success("Dane załadowane!")
+    st.success("Summary generated!")
     
     st.write(data["summary"])
     

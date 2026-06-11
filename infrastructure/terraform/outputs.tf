@@ -20,7 +20,7 @@ output "nlp_function_name" {
 }
 
 output "trend_function_name" {
-  value = azurerm_linux_function_app.trend.name
+  value = azurerm_linux_function_app.summary.name
 }
 
 output "frontend_url" {

@@ -39,7 +39,7 @@ jobs:
       - name: Deploy Query Function
         uses: Azure/functions-action@v1
         with:
-          app-name: func-query-news-trends
+          app-name: func-query-summary-generator
           package: query.zip
 
   deploy-nlp:
@@ -71,10 +71,10 @@ jobs:
       - name: Deploy NLP Function
         uses: Azure/functions-action@v1
         with:
-          app-name: func-nlp-news-trends
+          app-name: func-nlp-summary-generator
           package: nlp.zip
 
-  deploy-trend:
+  deploy-summary:
     runs-on: ubuntu-latest
 
     steps:
@@ -92,16 +92,16 @@ jobs:
 
       - name: Install deps
         run: |
-          cd services/trend-service
+          cd services/summary-service
           pip install -r requirements.txt -t .python_packages/lib/site-packages
 
       - name: Zip package
         run: |
-          cd services/trend-service
-          zip -r ../../trend.zip .
+          cd services/summary-service
+          zip -r ../../summary.zip .
 
-      - name: Deploy Trend Function
+      - name: Deploy Summary Function
         uses: Azure/functions-action@v1
         with:
-          app-name: func-trend-news-trends
-          package: trend.zip
+          app-name: func-summary-summary-generator
+          package: summary.zip

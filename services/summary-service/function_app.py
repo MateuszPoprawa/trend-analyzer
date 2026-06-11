@@ -16,8 +16,8 @@ SERVICE_BUS_CONN = os.environ["SERVICE_BUS_CONNECTION"]
 
 COSMOS_URI = os.environ["COSMOS_URI"]
 COSMOS_KEY = os.environ["COSMOS_KEY"]
-DB_NAME = "trenddb"
-CONTAINER_NAME = "trends"
+DB_NAME = "summarydb"
+CONTAINER_NAME = "summaries"
 
 # =========================
 # COSMOS CLIENT
@@ -30,13 +30,13 @@ container = cosmos_client.get_database_client(DB_NAME).get_container_client(CONT
 # =========================
 @app.service_bus_topic_trigger(
     arg_name="msg",
-    topic_name="analysis-results",
-    subscription_name="trend-subscription",
+    topic_name="summary-results",
+    subscription_name="summary-subscription",
     connection="SERVICE_BUS_CONNECTION"
 )
-def trend_service(msg: func.ServiceBusMessage):
+def summary_service(msg: func.ServiceBusMessage):
 
-    logging.info("Trend Service triggered")
+    logging.info("Summary Service triggered")
 
     data = json.loads(msg.get_body().decode("utf-8"))
 
@@ -46,7 +46,6 @@ def trend_service(msg: func.ServiceBusMessage):
     
     summary_result = {
         "id": id,
-        "topic": id,
         "url": url,
         "summary": summary
     }
@@ -56,18 +55,16 @@ def trend_service(msg: func.ServiceBusMessage):
     # =========================
     container.upsert_item(summary_result)
 
-
-
 # =========================
 # HTTP Endpoint
 # =========================
 
 @app.route(
-    route="trends",
+    route="summaries",
     methods=["GET"],
     auth_level=func.AuthLevel.ANONYMOUS
 )
-def get_trend(req: func.HttpRequest):
+def get_summary(req: func.HttpRequest):
 
     id = req.params.get("id")
 
