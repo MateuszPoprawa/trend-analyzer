@@ -46,6 +46,7 @@ def trend_service(msg: func.ServiceBusMessage):
     
     summary_result = {
         "id": id,
+        "topic": id,
         "url": url,
         "summary": summary
     }
