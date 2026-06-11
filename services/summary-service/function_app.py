@@ -67,6 +67,7 @@ def summary_service(msg: func.ServiceBusMessage):
 def get_summary(req: func.HttpRequest):
 
     id = req.params.get("id")
+    url = req.params.get("url")
 
     if not id:
         return func.HttpResponse(
@@ -76,7 +77,7 @@ def get_summary(req: func.HttpRequest):
 
     try:
         logging.info("ID: " + id)
-        item = container.read_item(item=id, partition_key=id)
+        item = container.read_item(item=id, partition_key=url)
 
         return func.HttpResponse(
             body=json.dumps(item),

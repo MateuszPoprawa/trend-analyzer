@@ -68,7 +68,7 @@ if refresh and url:
             try:
                 response = requests.get(
                     SUMMARY_URL,
-                    params={"id": id},
+                    params={"id": id, "url": url},
                     timeout=30
                 )
 
