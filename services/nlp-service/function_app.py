@@ -43,6 +43,7 @@ def nlp_service(msg: func.ServiceBusMessage):
 
     try:
         data = json.loads(msg.get_body().decode("utf-8"))
+        id = data.get("id")
         url = data.get("url")
         text = data.get("text", "")
         
@@ -56,7 +57,7 @@ def nlp_service(msg: func.ServiceBusMessage):
         
         logging.info("Summary generated")
 
-        send_to_service_bus(url, summary[0].summaries[0].text)
+        send_to_service_bus(id, url, summary[0].summaries[0].text)
 
     except Exception as e:
         logging.error(str(e))
@@ -65,7 +66,7 @@ def nlp_service(msg: func.ServiceBusMessage):
 # =========================
 # SERVICE BUS OUTPUT
 # =========================
-def send_to_service_bus(url: str, summary: str):
+def send_to_service_bus(id: str, url: str, summary: str):
 
     client = ServiceBusClient.from_connection_string(
         conn_str=SERVICE_BUS_CONN
@@ -76,6 +77,7 @@ def send_to_service_bus(url: str, summary: str):
 
         with sender:
             message = {
+                "id": id,
                 "url": url,
                 "summary": summary
             }

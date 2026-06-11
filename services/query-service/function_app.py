@@ -23,6 +23,7 @@ def query_service(req: func.HttpRequest) -> func.HttpResponse:
 
     try:
         body = req.get_json()
+        id = body.get("id")
         url = body.get("url")
 
         if not url:
@@ -44,7 +45,7 @@ def query_service(req: func.HttpRequest) -> func.HttpResponse:
 
         logging.info("Text: " + text)
 
-        send_to_service_bus(url, text)
+        send_to_service_bus(id, url, text)
 
         return func.HttpResponse(
             json.dumps({
@@ -62,7 +63,7 @@ def query_service(req: func.HttpRequest) -> func.HttpResponse:
 # =========================
 # SERVICE BUS SENDER
 # =========================
-def send_to_service_bus(url: str, text: str):
+def send_to_service_bus(id: str, url: str, text: str):
     client = ServiceBusClient.from_connection_string(
         conn_str=SERVICE_BUS_CONN,
         logging_enable=True
@@ -73,6 +74,7 @@ def send_to_service_bus(url: str, text: str):
 
         with sender:
             message = {
+                "id": id,
                 "url": url,
                 "text": text
             }

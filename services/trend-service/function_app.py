@@ -40,13 +40,14 @@ def trend_service(msg: func.ServiceBusMessage):
 
     data = json.loads(msg.get_body().decode("utf-8"))
 
+    id = data["id"]
     url = data["url"]
     summary = data["summary"]
     
     summary_result = {
-        "id": url,
+        "id": id,
         "url": url,
-        "sumarry": summary
+        "summary": summary
     }
 
     # =========================
@@ -67,19 +68,19 @@ def trend_service(msg: func.ServiceBusMessage):
 )
 def get_trend(req: func.HttpRequest):
 
-    url = req.params.get("url")
+    url = req.params.get("id")
 
     if not url:
         return func.HttpResponse(
-            "Missing url parameter",
+            "Missing id parameter",
             status_code=400
         )
 
     try:
 
         item = container.read_item(
-            item=url,
-            partition_key=url
+            item=id,
+            partition_key=id
         )
 
         return func.HttpResponse(

@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 import plotly.express as px
 import time
+import uuid
 
 # =========================
 # CONFIG
@@ -41,10 +42,11 @@ refresh = st.button("Analizuj temat")
 if refresh and topic:
 
     with st.spinner("Uruchamianie analizy..."):
-
+        id = str(uuid.uuid4())
         query_response = requests.post(
             QUERY_URL,
-            json={"url": topic},
+            json={"id": id,
+                   "url": topic},
             timeout=60
         )
 
@@ -71,7 +73,7 @@ if refresh and topic:
             try:
                 response = requests.get(
                     TREND_URL,
-                    params={"url": topic},
+                    params={"id": id},
                     timeout=30
                 )
 
