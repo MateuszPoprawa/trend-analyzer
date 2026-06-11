@@ -90,5 +90,5 @@ if refresh and url:
     st.success("Summary generated!")
     
     with st.container(border=True):
-        st.info(data["summary"])
+        st.write(data["summary"])
     
